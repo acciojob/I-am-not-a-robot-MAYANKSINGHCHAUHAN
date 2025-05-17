@@ -1,63 +1,74 @@
-const imageContainer = document.getElementById("image-container");
-const resetBtn = document.getElementById("reset");
-const verifyBtn = document.getElementById("verify");
-const message = document.getElementById("para");
 
-// Sample images (use your own images)
+//your code here
+// Image URLs
 const images = [
-    "img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg"
+    "https://picsum.photos/id/237/200/300", 
+    "https://picsum.photos/seed/picsum/200/300", 
+    "https://picsum.photos/200/300?grayscale", 
+    "https://picsum.photos/200/300/", 
+    "https://picsum.photos/200/300.jpg"
 ];
 
 let selectedImages = [];
-let randomizedImages = [];
+let duplicateIndex = Math.floor(Math.random() * images.length);
 
-function generateImages() {
-    let imagesCopy = [...images];
-    let duplicateImage = imagesCopy[Math.floor(Math.random() * imagesCopy.length)];
-    imagesCopy.push(duplicateImage);
+// Add duplicate image
+const shuffledImages = [...images, images[duplicateIndex]].sort(() => Math.random() - 0.5);
 
-    randomizedImages = imagesCopy.sort(() => Math.random() - 0.5);
+const container = document.getElementById('image-container');
+const resetButton = document.getElementById('reset');
+const verifyButton = document.getElementById('verify');
+const message = document.getElementById('para');
 
-    imageContainer.innerHTML = "";
-    randomizedImages.forEach((src, index) => {
-        const img = document.createElement("img");
+// ✅ Create and display images with correct class names
+function displayImages() {
+    shuffledImages.forEach((src, index) => {
+        const img = document.createElement('img');
         img.src = src;
+        img.className = `img${(index % 5) + 1}`; // Assign class names .img1 to .img5
         img.dataset.index = index;
-        img.onclick = () => selectImage(img);
-        imageContainer.appendChild(img);
+        img.addEventListener('click', () => selectImage(img));
+        container.appendChild(img);
     });
 }
 
 function selectImage(img) {
     if (selectedImages.length < 2 && !selectedImages.includes(img)) {
-        img.classList.add("selected");
+        img.classList.add('selected');
         selectedImages.push(img);
-    }
+        resetButton.style.display = 'block';
 
-    if (selectedImages.length === 2) {
-        verifyBtn.style.display = "inline-block";
+        if (selectedImages.length === 2) {
+            verifyButton.style.display = 'block';
+        }
     }
-    resetBtn.style.display = "inline-block";
+}
+
+function resetSelection() {
+    selectedImages.forEach(img => img.classList.remove('selected'));
+    selectedImages = [];
+    resetButton.style.display = 'none';
+    verifyButton.style.display = 'none';
+    message.textContent = "";
 }
 
 function verifySelection() {
-    if (selectedImages[0].src === selectedImages[1].src) {
-        message.innerText = "You are a human. Congratulations!";
-        message.style.color = "green";
-    } else {
-        message.innerText = "We can't verify you as a human. You selected the non-identical tiles.";
-        message.style.color = "red";
+    if (selectedImages.length === 2) {
+        const [img1, img2] = selectedImages;
+        if (img1.src === img2.src) {
+            message.textContent = "You are a human. Congratulations!";
+            message.style.color = "green";
+        } else {
+            message.textContent = "We can't verify you as a human. You selected the non-identical tiles.";
+            message.style.color = "red";
+        }
+        verifyButton.style.display = 'none';
     }
-    
-    verifyBtn.style.display = "none";
 }
 
-function resetGame() {
-    selectedImages.forEach(img => img.classList.remove("selected"));
-    selectedImages = [];
-    message.innerText = "";
-    verifyBtn.style.display = "none";
-    resetBtn.style.display = "none";
-}
+// Event Listeners
+resetButton.addEventListener('click', resetSelection);
+verifyButton.addEventListener('click', verifySelection);
 
-generateImages();
+// ✅ Initialize with fixed class names
+displayImages();
