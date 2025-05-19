@@ -1,4 +1,3 @@
-
 //your code here
 // Image URLs
 const images = [
